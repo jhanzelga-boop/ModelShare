@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Upload, Download, File, CheckCircle, AlertCircle, Loader2, Copy } from 'lucide-react';
+import { Upload, Download, File, CheckCircle, AlertCircle, Loader2, Copy, Sun, Moon } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -23,7 +23,29 @@ export default function App() {
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('theme');
+      if (saved) return saved as 'light' | 'dark';
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    return 'light';
+  });
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const root = window.document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  };
 
   const fetchFiles = async () => {
     try {
@@ -83,7 +105,6 @@ export default function App() {
       setSuccess(`Successfully uploaded ${result.originalName}`);
       fetchFiles();
       
-      // Clear success message after 5 seconds
       setTimeout(() => setSuccess(null), 5000);
     } catch (err: any) {
       setError(err.message || 'Failed to upload file. Please try again.');
@@ -112,20 +133,34 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa] text-[#1a1a1a] font-sans p-6 md:p-12 selection:bg-black selection:text-white">
+    <div className="min-h-screen bg-[#f8f9fa] dark:bg-[#0a0a0a] text-[#1a1a1a] dark:text-[#f0f0f0] font-sans p-6 md:p-12 transition-colors duration-300 selection:bg-black dark:selection:bg-white selection:text-white dark:selection:text-black">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <header className="mb-16">
+        <header className="mb-16 flex justify-between items-start">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
           >
             <h1 className="text-6xl font-light tracking-tighter mb-4">ModelShare</h1>
-            <p className="text-neutral-500 text-xl font-light max-w-lg leading-relaxed">
+            <p className="text-neutral-500 dark:text-neutral-400 text-xl font-light max-w-lg leading-relaxed">
               A minimal platform for uploading and sharing files with instant download links.
             </p>
           </motion.div>
+
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            onClick={toggleTheme}
+            className="p-4 rounded-3xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-sm hover:shadow-md transition-all active:scale-95"
+            title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+          >
+            {theme === 'light' ? (
+              <Moon className="w-6 h-6 text-neutral-600" />
+            ) : (
+              <Sun className="w-6 h-6 text-neutral-400" />
+            )}
+          </motion.button>
         </header>
 
         {/* Upload Section */}
@@ -141,7 +176,7 @@ export default function App() {
             onClick={() => !uploading && fileInputRef.current?.click()}
             className={cn(
               "relative border border-dashed rounded-[2rem] p-16 flex flex-col items-center justify-center transition-all duration-300 cursor-pointer group",
-              dragActive ? "border-black bg-black/5 scale-[1.02]" : "border-neutral-200 hover:border-neutral-400 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)]",
+              dragActive ? "border-black dark:border-white bg-black/5 dark:bg-white/5 scale-[1.02]" : "border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)]",
               uploading && "opacity-50 cursor-not-allowed"
             )}
           >
@@ -152,11 +187,11 @@ export default function App() {
               onChange={(e) => e.target.files?.[0] && handleUpload(e.target.files[0])}
             />
             
-            <div className="mb-6 p-5 rounded-3xl bg-neutral-50 group-hover:bg-neutral-100 transition-colors">
+            <div className="mb-6 p-5 rounded-3xl bg-neutral-50 dark:bg-neutral-800 group-hover:bg-neutral-100 dark:group-hover:bg-neutral-700 transition-colors">
               {uploading ? (
                 <Loader2 className="w-10 h-10 animate-spin text-neutral-400" />
               ) : (
-                <Upload className="w-10 h-10 text-neutral-600" />
+                <Upload className="w-10 h-10 text-neutral-600 dark:text-neutral-300" />
               )}
             </div>
             
@@ -179,7 +214,7 @@ export default function App() {
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="absolute inset-0 p-4 rounded-2xl bg-red-50 text-red-600 flex items-center gap-3 border border-red-100"
+                  className="absolute inset-0 p-4 rounded-2xl bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 flex items-center gap-3 border border-red-100 dark:border-red-900/50"
                 >
                   <AlertCircle className="w-5 h-5" />
                   <span className="text-sm font-medium">{error}</span>
@@ -191,7 +226,7 @@ export default function App() {
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="absolute inset-0 p-4 rounded-2xl bg-green-50 text-green-600 flex items-center gap-3 border border-green-100"
+                  className="absolute inset-0 p-4 rounded-2xl bg-green-50 dark:bg-green-950/30 text-green-600 dark:text-green-400 flex items-center gap-3 border border-green-100 dark:border-green-900/50"
                 >
                   <CheckCircle className="w-5 h-5" />
                   <span className="text-sm font-medium">{success}</span>
@@ -205,7 +240,7 @@ export default function App() {
         <section>
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-3xl font-medium tracking-tight">Recent Uploads</h2>
-            <div className="px-4 py-1 rounded-full bg-neutral-100 text-neutral-500 text-sm font-medium">
+            <div className="px-4 py-1 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 text-sm font-medium">
               {files.length} {files.length === 1 ? 'file' : 'files'}
             </div>
           </div>
@@ -216,9 +251,9 @@ export default function App() {
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="text-center py-24 bg-white rounded-[2rem] border border-neutral-100 shadow-sm"
+                  className="text-center py-24 bg-white dark:bg-neutral-900/50 rounded-[2rem] border border-neutral-100 dark:border-neutral-800 shadow-sm"
                 >
-                  <File className="w-16 h-16 mx-auto mb-6 text-neutral-200" />
+                  <File className="w-16 h-16 mx-auto mb-6 text-neutral-200 dark:text-neutral-800" />
                   <p className="text-neutral-400 text-lg font-light">No files uploaded yet.</p>
                 </motion.div>
               ) : (
@@ -229,17 +264,17 @@ export default function App() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95 }}
-                    className="bg-white p-5 rounded-3xl border border-neutral-100 shadow-sm flex items-center gap-5 group hover:shadow-md hover:border-neutral-200 transition-all duration-300"
+                    className="bg-white dark:bg-neutral-900 p-5 rounded-3xl border border-neutral-100 dark:border-neutral-800 shadow-sm flex items-center gap-5 group hover:shadow-md hover:border-neutral-200 dark:hover:border-neutral-700 transition-all duration-300"
                   >
-                    <div className="p-4 rounded-2xl bg-neutral-50 group-hover:bg-neutral-100 transition-colors">
-                      <File className="w-7 h-7 text-neutral-600" />
+                    <div className="p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800 group-hover:bg-neutral-100 dark:group-hover:bg-neutral-700 transition-colors">
+                      <File className="w-7 h-7 text-neutral-600 dark:text-neutral-300" />
                     </div>
                     
                     <div className="flex-1 min-w-0">
                       <h3 className="text-lg font-medium truncate mb-1">{file.original_name}</h3>
                       <div className="flex items-center gap-3 text-sm text-neutral-400 font-light">
                         <span>{formatSize(file.size)}</span>
-                        <span className="w-1 h-1 rounded-full bg-neutral-200" />
+                        <span className="w-1 h-1 rounded-full bg-neutral-200 dark:bg-neutral-700" />
                         <span>{new Date(file.upload_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                       </div>
                     </div>
@@ -247,14 +282,14 @@ export default function App() {
                     <div className="flex items-center gap-3">
                       <button
                         onClick={() => copyLink(file.id)}
-                        className="p-3 rounded-xl hover:bg-neutral-50 text-neutral-400 hover:text-neutral-900 transition-all"
+                        className="p-3 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-all"
                         title="Copy download link"
                       >
                         <Copy className="w-6 h-6" />
                       </button>
                       <a
                         href={`/api/download/${file.id}`}
-                        className="p-3 rounded-xl bg-black text-white hover:bg-neutral-800 transition-all shadow-lg shadow-black/5"
+                        className="p-3 rounded-xl bg-black dark:bg-white text-white dark:text-black hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-all shadow-lg shadow-black/5"
                         title="Download"
                       >
                         <Download className="w-6 h-6" />
