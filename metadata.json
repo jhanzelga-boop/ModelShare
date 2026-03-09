@@ -1,0 +1,5 @@
+{
+  "name": "ModelShare",
+  "description": "A simple platform to upload and share models with download links.",
+  "requestFramePermissions": []
+}
