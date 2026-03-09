@@ -23,10 +23,16 @@ db.exec(`
   )
 `);
 
-// Ensure upload directory exists
+// Ensure upload directory exists and is clean
 const uploadDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
+} else {
+  // Clear existing files on restart as requested
+  const files = fs.readdirSync(uploadDir);
+  for (const file of files) {
+    fs.unlinkSync(path.join(uploadDir, file));
+  }
 }
 
 // Multer configuration

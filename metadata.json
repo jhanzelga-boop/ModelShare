@@ -1,5 +1,5 @@
 {
-  "name": "ModelShare",
-  "description": "A simple platform to upload and share models with download links.",
+  "name": "My Private Model Vault",
+  "description": "A personal, secure space for uploading and sharing my models.",
   "requestFramePermissions": []
 }

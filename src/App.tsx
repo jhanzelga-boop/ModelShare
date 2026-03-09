@@ -133,174 +133,195 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa] dark:bg-[#0a0a0a] text-[#1a1a1a] dark:text-[#f0f0f0] font-sans p-6 md:p-12 transition-colors duration-300 selection:bg-black dark:selection:bg-white selection:text-white dark:selection:text-black">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <header className="mb-16 flex justify-between items-start">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-          >
-            <h1 className="text-6xl font-light tracking-tighter mb-4">ModelShare</h1>
-            <p className="text-neutral-500 dark:text-neutral-400 text-xl font-light max-w-lg leading-relaxed">
-              A minimal platform for uploading and sharing files with instant download links.
-            </p>
-          </motion.div>
-
-          <motion.button
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
+    <div className="min-h-screen bg-white dark:bg-[#050505] text-[#1a1a1a] dark:text-[#f0f0f0] font-mono p-4 md:p-8 transition-colors duration-300 selection:bg-black dark:selection:bg-white selection:text-white dark:selection:text-black">
+      <div className="max-w-5xl mx-auto border border-neutral-200 dark:border-neutral-800 min-h-[calc(100vh-4rem)] flex flex-col">
+        {/* Top Bar */}
+        <div className="border-bottom border-neutral-200 dark:border-neutral-800 p-4 flex justify-between items-center bg-neutral-50 dark:bg-neutral-900/50">
+          <div className="flex items-center gap-4">
+            <div className="w-3 h-3 rounded-full bg-red-500" />
+            <div className="w-3 h-3 rounded-full bg-yellow-500" />
+            <div className="w-3 h-3 rounded-full bg-green-500" />
+            <span className="ml-4 text-xs font-bold tracking-widest uppercase opacity-50">Vault v1.0.4</span>
+          </div>
+          <button
             onClick={toggleTheme}
-            className="p-4 rounded-3xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-sm hover:shadow-md transition-all active:scale-95"
-            title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+            className="p-2 hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors rounded"
           >
-            {theme === 'light' ? (
-              <Moon className="w-6 h-6 text-neutral-600" />
-            ) : (
-              <Sun className="w-6 h-6 text-neutral-400" />
-            )}
-          </motion.button>
-        </header>
+            {theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
+          </button>
+        </div>
 
-        {/* Upload Section */}
-        <section className="mb-16">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.98 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
-            onDragEnter={handleDrag}
-            onDragLeave={handleDrag}
-            onDragOver={handleDrag}
-            onDrop={handleDrop}
-            onClick={() => !uploading && fileInputRef.current?.click()}
-            className={cn(
-              "relative border border-dashed rounded-[2rem] p-16 flex flex-col items-center justify-center transition-all duration-300 cursor-pointer group",
-              dragActive ? "border-black dark:border-white bg-black/5 dark:bg-white/5 scale-[1.02]" : "border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)]",
-              uploading && "opacity-50 cursor-not-allowed"
-            )}
-          >
-            <input
-              ref={fileInputRef}
-              type="file"
-              className="hidden"
-              onChange={(e) => e.target.files?.[0] && handleUpload(e.target.files[0])}
-            />
-            
-            <div className="mb-6 p-5 rounded-3xl bg-neutral-50 dark:bg-neutral-800 group-hover:bg-neutral-100 dark:group-hover:bg-neutral-700 transition-colors">
-              {uploading ? (
-                <Loader2 className="w-10 h-10 animate-spin text-neutral-400" />
-              ) : (
-                <Upload className="w-10 h-10 text-neutral-600 dark:text-neutral-300" />
-              )}
-            </div>
-            
-            <div className="text-center">
-              <p className="text-2xl font-medium mb-2">
-                {uploading ? "Uploading..." : "Click or drag to upload"}
+        <div className="flex-1 p-6 md:p-12">
+          {/* Header */}
+          <header className="mb-12">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <h1 className="text-4xl font-bold tracking-tighter mb-2 uppercase">My Private Vault</h1>
+              <div className="h-1 w-24 bg-black dark:bg-white mb-4" />
+              <p className="text-neutral-500 dark:text-neutral-400 text-sm max-w-md leading-relaxed">
+                Secure, local-first file storage and distribution system.
+                Authoritative data store initialized.
               </p>
-              <p className="text-neutral-400 font-light">
-                Support for any file type up to 50MB
-              </p>
-            </div>
-          </motion.div>
+            </motion.div>
+          </header>
 
-          {/* Messages */}
-          <div className="h-16 mt-4 relative">
-            <AnimatePresence mode="wait">
-              {error && (
-                <motion.div
-                  key="error"
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="absolute inset-0 p-4 rounded-2xl bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 flex items-center gap-3 border border-red-100 dark:border-red-900/50"
-                >
-                  <AlertCircle className="w-5 h-5" />
-                  <span className="text-sm font-medium">{error}</span>
-                </motion.div>
-              )}
-              {success && (
-                <motion.div
-                  key="success"
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="absolute inset-0 p-4 rounded-2xl bg-green-50 dark:bg-green-950/30 text-green-600 dark:text-green-400 flex items-center gap-3 border border-green-100 dark:border-green-900/50"
-                >
-                  <CheckCircle className="w-5 h-5" />
-                  <span className="text-sm font-medium">{success}</span>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        </section>
+          {/* Main Content Grid */}
+          <div className="grid md:grid-cols-[1fr_350px] gap-12">
+            {/* Left Column: Files */}
+            <section>
+              <div className="flex items-center justify-between mb-6 border-b border-neutral-200 dark:border-neutral-800 pb-2">
+                <h2 className="text-xs font-bold uppercase tracking-widest opacity-50">Stored Assets</h2>
+                <span className="text-[10px] font-mono">{files.length} ITEMS</span>
+              </div>
 
-        {/* Files List */}
-        <section>
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-medium tracking-tight">Recent Uploads</h2>
-            <div className="px-4 py-1 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 text-sm font-medium">
-              {files.length} {files.length === 1 ? 'file' : 'files'}
-            </div>
-          </div>
-
-          <div className="grid gap-4">
-            <AnimatePresence initial={false}>
-              {files.length === 0 ? (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="text-center py-24 bg-white dark:bg-neutral-900/50 rounded-[2rem] border border-neutral-100 dark:border-neutral-800 shadow-sm"
-                >
-                  <File className="w-16 h-16 mx-auto mb-6 text-neutral-200 dark:text-neutral-800" />
-                  <p className="text-neutral-400 text-lg font-light">No files uploaded yet.</p>
-                </motion.div>
-              ) : (
-                files.map((file) => (
-                  <motion.div
-                    layout
-                    key={file.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    className="bg-white dark:bg-neutral-900 p-5 rounded-3xl border border-neutral-100 dark:border-neutral-800 shadow-sm flex items-center gap-5 group hover:shadow-md hover:border-neutral-200 dark:hover:border-neutral-700 transition-all duration-300"
-                  >
-                    <div className="p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800 group-hover:bg-neutral-100 dark:group-hover:bg-neutral-700 transition-colors">
-                      <File className="w-7 h-7 text-neutral-600 dark:text-neutral-300" />
-                    </div>
-                    
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-lg font-medium truncate mb-1">{file.original_name}</h3>
-                      <div className="flex items-center gap-3 text-sm text-neutral-400 font-light">
-                        <span>{formatSize(file.size)}</span>
-                        <span className="w-1 h-1 rounded-full bg-neutral-200 dark:bg-neutral-700" />
-                        <span>{new Date(file.upload_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      <button
-                        onClick={() => copyLink(file.id)}
-                        className="p-3 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-all"
-                        title="Copy download link"
+              <div className="space-y-2">
+                <AnimatePresence initial={false}>
+                  {files.length === 0 ? (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="py-12 border border-dashed border-neutral-200 dark:border-neutral-800 flex flex-col items-center justify-center grayscale opacity-50"
+                    >
+                      <File size={32} className="mb-4" />
+                      <p className="text-xs uppercase tracking-tighter">Vault Empty</p>
+                    </motion.div>
+                  ) : (
+                    files.map((file) => (
+                      <motion.div
+                        layout
+                        key={file.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        className="group flex items-center gap-4 p-3 border border-neutral-100 dark:border-neutral-900 hover:border-black dark:hover:border-white transition-all cursor-default"
                       >
-                        <Copy className="w-6 h-6" />
-                      </button>
-                      <a
-                        href={`/api/download/${file.id}`}
-                        className="p-3 rounded-xl bg-black dark:bg-white text-white dark:text-black hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-all shadow-lg shadow-black/5"
-                        title="Download"
+                        <div className="w-10 h-10 flex items-center justify-center bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 group-hover:bg-black group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-black transition-colors">
+                          <File size={18} />
+                        </div>
+                        
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-sm font-bold truncate uppercase">{file.original_name}</h3>
+                          <div className="flex items-center gap-2 text-[10px] opacity-50">
+                            <span>{formatSize(file.size)}</span>
+                            <span>/</span>
+                            <span>{new Date(file.upload_date).toISOString().split('T')[0]}</span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button
+                            onClick={() => copyLink(file.id)}
+                            className="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                            title="Copy Link"
+                          >
+                            <Copy size={14} />
+                          </button>
+                          <a
+                            href={`/api/download/${file.id}`}
+                            className="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                            title="Download"
+                          >
+                            <Download size={14} />
+                          </a>
+                        </div>
+                      </motion.div>
+                    ))
+                  )}
+                </AnimatePresence>
+              </div>
+            </section>
+
+            {/* Right Column: Upload & Status */}
+            <aside className="space-y-8">
+              <div className="border border-neutral-200 dark:border-neutral-800 p-6 bg-neutral-50 dark:bg-neutral-900/30">
+                <h2 className="text-xs font-bold uppercase tracking-widest mb-4 opacity-50">Ingest</h2>
+                <div
+                  onDragEnter={handleDrag}
+                  onDragLeave={handleDrag}
+                  onDragOver={handleDrag}
+                  onDrop={handleDrop}
+                  onClick={() => !uploading && fileInputRef.current?.click()}
+                  className={cn(
+                    "border-2 border-dashed p-8 flex flex-col items-center justify-center transition-all duration-200 cursor-pointer",
+                    dragActive ? "border-black dark:border-white bg-black/5 dark:bg-white/5" : "border-neutral-300 dark:border-neutral-700 hover:border-neutral-400 dark:hover:border-neutral-600",
+                    uploading && "opacity-50 cursor-wait"
+                  )}
+                >
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    className="hidden"
+                    onChange={(e) => e.target.files?.[0] && handleUpload(e.target.files[0])}
+                  />
+                  {uploading ? (
+                    <Loader2 className="w-6 h-6 animate-spin mb-2" />
+                  ) : (
+                    <Upload className="w-6 h-6 mb-2" />
+                  )}
+                  <span className="text-[10px] font-bold uppercase tracking-tighter">
+                    {uploading ? "Processing..." : "Drop File"}
+                  </span>
+                </div>
+
+                <div className="mt-4 space-y-2">
+                  <AnimatePresence mode="wait">
+                    {error && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="text-[10px] text-red-500 font-bold uppercase flex items-center gap-2"
                       >
-                        <Download className="w-6 h-6" />
-                      </a>
-                    </div>
-                  </motion.div>
-                ))
-              )}
-            </AnimatePresence>
+                        <AlertCircle size={12} /> {error}
+                      </motion.div>
+                    )}
+                    {success && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="text-[10px] text-green-500 font-bold uppercase flex items-center gap-2"
+                      >
+                        <CheckCircle size={12} /> {success}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </div>
+
+              <div className="border border-neutral-200 dark:border-neutral-800 p-6">
+                <h2 className="text-xs font-bold uppercase tracking-widest mb-4 opacity-50">System Status</h2>
+                <div className="space-y-3">
+                  <div className="flex justify-between text-[10px]">
+                    <span className="opacity-50 uppercase">Database</span>
+                    <span className="text-green-500 font-bold uppercase">Online</span>
+                  </div>
+                  <div className="flex justify-between text-[10px]">
+                    <span className="opacity-50 uppercase">Storage</span>
+                    <span className="font-bold uppercase">50MB Limit</span>
+                  </div>
+                  <div className="flex justify-between text-[10px]">
+                    <span className="opacity-50 uppercase">Network</span>
+                    <span className="text-green-500 font-bold uppercase">Connected</span>
+                  </div>
+                </div>
+              </div>
+            </aside>
           </div>
-        </section>
+        </div>
+
+        {/* Footer */}
+        <footer className="border-t border-neutral-200 dark:border-neutral-800 p-6 bg-neutral-50 dark:bg-neutral-900/50 flex justify-between items-center">
+          <div className="text-[10px] font-bold uppercase tracking-widest opacity-30">
+            &copy; {new Date().getFullYear()} My Private Vault
+          </div>
+          <div className="text-[10px] font-bold uppercase tracking-widest opacity-50">
+            Handcrafted with precision
+          </div>
+        </footer>
       </div>
     </div>
   );
